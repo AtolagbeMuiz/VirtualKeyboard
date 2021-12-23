@@ -23,17 +23,19 @@ const keyboard = {
         keyboard.element.mainkeyboardContainer = document.createElement("div");
         keyboard.element.keysContainer = document.createElement("div");
 
-        //setup keyboard elements
+        //setup keyboard elements with the classes
         this.element.mainkeyboardContainer.classList.add("keyboard", "1keyboard--hidden");
         this.element.keysContainer.classList.add("keyboard__keys");
 
+        //this appends the created keys to the keys container
         this.element.keysContainer.appendChild(this._createKeys());
 
+        //select the class and apply css for each key
         this.element.keys = this.element.keysContainer.querySelectorAll(".keyboard__key");
 
-        //Add the elemts to the DOM
-        this.element.mainkeyboardContainer.appendChild(this.element.keysContainer);
-        document.body.appendChild(this.element.mainkeyboardContainer);
+        //Add the elements to the DOM (i.e combines the elemnets with each other to create sub-element)
+        this.element.mainkeyboardContainer.appendChild(this.element.keysContainer); //appends keys_container to Main keyboard container as a child element
+        document.body.appendChild(this.element.mainkeyboardContainer);  //appends the previous step both parent and child element to the document object
     },
 
     _createKeys(){
@@ -51,15 +53,27 @@ const keyboard = {
             return `<i class="material-icons">${iconName}</i>`;
         }
 
+        let insertLineBreak = false;
         keyLayout.forEach(key => {
             const keyButton = document.createElement("button");
-            const insertLineBreak = ["backspace", "p", "enter", "?"].indexOf(key) !== -1;
-
             //Add Attribute/classes to each element
             keyButton.setAttribute("type", "button");
             keyButton.classList.add("keyboard__key");
-            
+
+
+           //const insertLineBreak = ["backspace", "p", "enter", "?"].indexOf(key) !== -1;
+
+           const arrayElements = ["backspace", "p", "enter", "?"];
            
+           var indexCheck = arrayElements.indexOf(key);
+          // checks if the array contains the key
+           if(indexCheck >-1  ){
+               insertLineBreak = true;
+           }
+            else{
+                insertLineBreak = false;
+            }
+                                   
 
             switch (key) {
                 case "backspace":
