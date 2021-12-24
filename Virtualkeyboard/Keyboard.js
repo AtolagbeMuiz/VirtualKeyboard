@@ -24,18 +24,32 @@ const keyboard = {
         keyboard.element.keysContainer = document.createElement("div");
 
         //setup keyboard elements with the classes
-        this.element.mainkeyboardContainer.classList.add("keyboard", "1keyboard--hidden");
+        this.element.mainkeyboardContainer.classList.add("keyboard", "keyboard--hidden");
         this.element.keysContainer.classList.add("keyboard__keys");
 
         //this appends the created keys to the keys container
         this.element.keysContainer.appendChild(this._createKeys());
 
-        //select the class and apply css for each key
+        //this select all keys with the class and initilize the keys array with it
         this.element.keys = this.element.keysContainer.querySelectorAll(".keyboard__key");
 
         //Add the elements to the DOM (i.e combines the elemnets with each other to create sub-element)
         this.element.mainkeyboardContainer.appendChild(this.element.keysContainer); //appends keys_container to Main keyboard container as a child element
         document.body.appendChild(this.element.mainkeyboardContainer);  //appends the previous step both parent and child element to the document object
+
+
+        // const useKeyboard = document.querySelector(".keyboard-use");
+        // useKeyboard.addEventListener("focus", () => {
+        //     this.element.mainkeyboardContainer.classList.remove("keyboard--hidden");
+        // });
+
+        document.querySelectorAll(".keyboard-use").forEach(element => {
+            element.addEventListener("focus", () =>{
+                this.open(element.value, currentValue => {
+                    element.value = currentValue;
+                });
+            });
+        });
     },
 
     _createKeys(){
@@ -56,6 +70,7 @@ const keyboard = {
         let insertLineBreak = false;
         keyLayout.forEach(key => {
             const keyButton = document.createElement("button");
+            
             //Add Attribute/classes to each element
             keyButton.setAttribute("type", "button");
             keyButton.classList.add("keyboard__key");
@@ -99,7 +114,7 @@ const keyboard = {
                     break;
 
                 case "enter":
-                    keyButton.classList.add("keyboard__key--wide");
+                    keyButton.classList.add("keyboard__key--wide"); 
                     keyButton.innerHTML = createIconElement("keyboard_return");
 
                     keyButton.addEventListener("click", () => {
@@ -138,7 +153,7 @@ const keyboard = {
                 //keyButton.textContent = key;
                 keyButton.addEventListener("click", () => {
                    this.properties.value += this.properties.capsLock? key.toUpperCase() : key;
-                    this._triggerEvent("oninput");
+                    this._triggerEvent("guy");
                 });
 
                 break;
@@ -157,25 +172,46 @@ const keyboard = {
     },
 
     _triggerEvent(handlerName){
-        console.log("Event Triggered!... Event Name: " + handlerName);
+        if(typeof this.eventHandlers[handlerName] == "function"){
+            this.eventHandlers[handlerName](this.properties.value);
+        }
     },
 
     _toggleCapsLock(){
+        //sets the boolean capsLock property to true or false when capsLock is pressed
         this.properties.capsLock = !this.properties.capsLock;
 
+        //loops through the keys 
         for(const key of this.element.keys){
+
+            //checks if the current element being looped through doesnt have a child element; in this case an Icon 
             if(key.childElementCount === 0){
-                key.textContent = this.properties.capsLock ? key.textContent.toUpperCase() : key.textContent.toLowerCase();
+               // key.textContent = this.properties.capsLock ? key.textContent.toUpperCase() : key.textContent.toLowerCase();
+               
+               if(this.properties.capsLock === true){
+                   key.textContent = key.textContent.toUpperCase();
+               }
+               else{
+                key.textContent = key.textContent.toLowerCase();
+               }
             }
         }
     },
 
     open(initialValue, oninput, onclose){
+        this.properties.value = initialValue || "";
+        this.eventHandlers.oninput = oninput;
+        this.eventHandlers.onclose = onclose;
 
+        this.element.mainkeyboardContainer.classList.remove("keyboard--hidden");
     },
 
     close(){
-
+        this.properties.value = "";
+        this.eventHandlers.oninput = oninput;
+        this.eventHandlers.onclose = onclose;
+        this.element.mainkeyboardContainer.classList.add("keyboard--hidden");
+        // this.mainkeyboardContainer.querySelectorAll(".keyboard--hidden");
     }
 };
 
